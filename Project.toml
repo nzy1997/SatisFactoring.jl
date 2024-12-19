@@ -1,0 +1,13 @@
+name = "SatisFactoring"
+uuid = "5f1cdc0a-6a9d-424d-9080-b28f83c5067f"
+authors = ["nzy1997"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.11"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

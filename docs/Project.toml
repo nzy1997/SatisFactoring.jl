@@ -1,0 +1,3 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+SatisFactoring = "5f1cdc0a-6a9d-424d-9080-b28f83c5067f"

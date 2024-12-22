@@ -4,6 +4,7 @@ struct TensorNetworkProblem
     vals::Vector{Bool}
     symbols::Vector{Symbol}
 end
+# [replace(t,Tropical(1.0) => zero(Tropical{Float64})) for t in tensors]
 
 v2he(he2v::Vector{Vector{Int}}) = [findall(x->i in x, he2v) for i in 1:maximum(maximum,he2v)]
 v2he(tnp::TensorNetworkProblem) = v2he(tnp.he2v)

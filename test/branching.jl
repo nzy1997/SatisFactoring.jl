@@ -7,6 +7,7 @@ using SatisFactoring: BranchingSituation
 using SatisFactoring.GenericTensorNetworks.ProblemReductions
 using SatisFactoring.BitBasis
 using SatisFactoring.Random
+using Primes
 
 @testset "simplify1" begin
     @bools a b c d e f g
@@ -180,4 +181,19 @@ end
             @test !check_satisfiable(tnp_outcome2,sat.cnf)
         end
     end
+end
+
+@testset "factoring" begin
+    p1 = prevprime(128)
+    p2 = prevprime(64)
+
+    factoring = Factoring(7, 6, p1*p2)
+    res = reduceto(CircuitSAT, factoring)
+    tnp = sat2tnp(res.circuit)
+
+    ans,tnp = branching(tnp,second_neighbor_optimal_branching)
+    @test ans == true
+    assignment3 = Dict(zip(res.circuit.symbols, tnp.vals))
+    a, b = ProblemReductions.read_solution(factoring, [tnp.vals[res.p]...,tnp.vals[res.q]...])
+    @test a * b == p1*p2
 end

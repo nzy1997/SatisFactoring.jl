@@ -141,11 +141,12 @@ function make_branching_table(subtnp::SubTNP, tnp::TensorNetworkProblem)
 		out_index = [i ? 2 : 1 for i in answer]
 		vec = [i ∈ subtnp.outside_vs_ind ? out_index[ind_pos[i]] : (:) for i in 1:vs_num]
 		new_tensors = sub_tensors[vec...]
-		in_index = findfirst(==(Tropical(0.0)), new_tensors)
-		if isnothing(in_index)
+		in_indies = findall(==(Tropical(0.0)), new_tensors)
+		if length(in_indies) == 0
 			continue
 		end
-		push!(possible_configurations, [[i ∈ subtnp.outside_vs_ind ? out_index[ind_pos[i]] : in_index[ind_pos[i]] for i in 1:vs_num] .== fill(2, vs_num)])
+		pcs = [[i ∈ subtnp.outside_vs_ind ? out_index[ind_pos[i]] : in_index[ind_pos[i]] for i in 1:vs_num] .== fill(2, vs_num) for in_index in in_indies]
+		push!(possible_configurations, pcs)
 	end
 	return BranchingTable(vs_num, possible_configurations)
 end

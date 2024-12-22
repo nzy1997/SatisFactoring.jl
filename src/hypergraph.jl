@@ -46,6 +46,9 @@ function random_sat_problem(literal_num::Int, clause_num::Int)
         true_literals = sample(1:literal_num, rand(0:literal_num-1), replace=false)
         false_literals = sample(setdiff(1:literal_num,true_literals), rand(0:literal_num-length(true_literals)), replace=false)
         clause = CNFClause{Symbol}([[BoolVar{Symbol}(symbols[i],false) for i in true_literals]..., [BoolVar{Symbol}(symbols[i],true) for i in false_literals]...])
+        if length(clause) == 0
+            continue
+        end
         push!(clauses, clause)
     end
     return Satisfiability(CNF(clauses))

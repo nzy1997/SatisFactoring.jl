@@ -141,14 +141,15 @@ end
 end
 
 @testset "factoring" begin
-    factoring = Factoring(2, 1, 3)
+    factoring = Factoring(2, 2, 6)
     res = reduceto(CircuitSAT, factoring)
     tnp = sat2tnp(res.circuit)
 
     ans,tnp = branching(tnp,second_neighbor_optimal_branching)
     @test ans == true
     assignment3 = Dict(zip(res.circuit.symbols, tnp.vals))
-    @test (2* assignment3[:p2]+ assignment3[:p1]) * assignment3[:q1] == 3
+    a, b = ProblemReductions.read_solution(factoring, [tnp.vals[res.p]...,tnp.vals[res.q]...])
+    @test a * b == 6
 end
 
 @testset "circuitsat" begin
@@ -163,11 +164,20 @@ end
 
 @testset "random_sat_problem" begin
     Random.seed!(1)
-    num = 3
-    for _ in 1:num
-        tnp = sat2tnp(random_sat_problem(5, 10))
-        ans,tnp = branching(tnp,single_branching)
-        ans2, tnp2 = branching(tnp,second_neighbor_optimal_branching)
+    num = 100
+    for i in 1:num
+        sat = random_sat_problem(5, 10)
+        tnp = sat2tnp(sat)
+        ans,tnp_outcome = branching(tnp,single_branching)
+        ans2, tnp_outcome2 = branching(tnp,second_neighbor_optimal_branching)
         @test ans2 == ans
+        if ans
+            @test check_satisfiable(tnp_outcome,sat.cnf)
+            @test check_satisfiable(tnp_outcome2,sat.cnf)
+        else
+            check_satisfiable(tnp_outcome,sat.cnf) && (@show i)
+            @test !check_satisfiable(tnp_outcome,sat.cnf)
+            @test !check_satisfiable(tnp_outcome2,sat.cnf)
+        end
     end
 end

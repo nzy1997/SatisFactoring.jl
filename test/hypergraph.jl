@@ -84,6 +84,5 @@ end
     Random.seed!(1234)
     sat = random_sat_problem(5, 10)
 
-    @test length(sat.cnf) == 10
     @test length(sat.symbols) == 5
 end

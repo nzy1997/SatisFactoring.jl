@@ -85,12 +85,11 @@ function branching(tnp::TensorNetworkProblem, branching_strategy)
 	if any([all(==(Tropical(1.0)), t) for t in tnp.tensors])
 		return false, tnp
 	end
-
 	bss = branching_strategy(tnp)
 	for bs in bss
-		res, tnp = branching(decide_literal(tnp, bs), branching_strategy)
+		res, tnp2 = branching(decide_literal(tnp, bs), branching_strategy)
 		if res
-			return true, tnp
+			return true, tnp2
 		end
 	end
 	return false, tnp
@@ -120,6 +119,7 @@ function neighbor_optimal_branching(tnp::TensorNetworkProblem)
 	return subtnp_optimal_branching(tnp, subtnp)
 end
 
+# branching on sub problem: subtnp
 function subtnp_optimal_branching(tnp::TensorNetworkProblem, subtnp::SubTNP)
 	tbl = make_branching_table(subtnp, tnp)
 	candidates = collect(OptimalBranchingCore.candidate_clauses(tbl))
@@ -130,7 +130,7 @@ end
 
 function make_branching_table(subtnp::SubTNP, tnp::TensorNetworkProblem)
 	eincode = DynamicEinCode{Int}(tnp.he2v[subtnp.edges], subtnp.vs)
-	optcode = optimize_code(eincode, uniformsize(eincode, 2), TreeSA())
+	optcode = optimize_code(eincode, uniformsize(eincode, 2), GreedyMethod())
 	sub_tensors = optcode(tnp.tensors[subtnp.edges]...)
 	out_vs_num = length(subtnp.outside_vs_ind)
 	vs_num = length(subtnp.vs)
@@ -150,6 +150,7 @@ function make_branching_table(subtnp::SubTNP, tnp::TensorNetworkProblem)
 	return BranchingTable(vs_num, possible_configurations)
 end
 
+#possilble loss function: number of vertices, number of 3-degree vertices
 function loss_function(tnp::TensorNetworkProblem, cl::Clause, sub_pos::Vector{Int})
 	pos, val = get_val(cl, sub_pos)
 	edge_num = length(tnp.he2v)
